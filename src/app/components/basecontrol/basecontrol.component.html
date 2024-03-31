@@ -32,7 +32,7 @@
 </div>
 
 <ng-template #option let-options="options">
-  <vscode-dropdown [value]="data.getValue() || data.default || undefined">
+  <vscode-dropdown [value]="data.getValue() || data.default">
     <vscode-option *ngFor="let option of data.options" (mousedown)="onChange($event)"
       [value]="option.value">{{option.name}}</vscode-option>
   </vscode-dropdown>
@@ -42,7 +42,7 @@
 <!-- Single line text field -->
 <ng-template #string let-value="value" let-index="index">
   <ng-container *ngIf="!data.multiline; else stringMulti">
-    <input type="text" class="w-full cid-input" (blur)="onChange($event, index)" (keyup)="onChange($event, index)"
+    <input type="text" class="w-full cid-input" (blur)="onChange($event, index)" (keyup.enter)="onChange($event, index)"
       [class.cid-required]="isEmpty()" autocomplete="off" [placeholder]="data.hint || ''" [value]="value"
       [readonly]="getPermission() === Permission.ReadOnly" />
   </ng-container>
