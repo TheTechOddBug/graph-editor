@@ -15,7 +15,7 @@ export class BaseControlComponent implements OnChanges {
 
   @Input() data!: BaseControl<BaseControlType>;
   @Input() rendered!: () => void;
-  @ViewChild('input') inputField: ElementRef<HTMLElement> | undefined;
+  @ViewChild('input') inputField: ElementRef<HTMLInputElement> | undefined;
 
   Permission = Permission
 
@@ -62,13 +62,13 @@ export class BaseControlComponent implements OnChanges {
     // The code below mimics the click event by finding the original
     // click position in the text field and setting the text cursor
     // at the requested position.
-    if (event instanceof PointerEvent) {
+    if (event instanceof PointerEvent && event.target instanceof HTMLInputElement) {
 
       // Calculate the cursor position based on the click coordinates
       const cursorPosition = getCursorPosition(event.clientX, event.clientY, event.target as HTMLInputElement);
 
       // Set the cursor position in the input field
-      if (this.inputField && this.inputField.nativeElement instanceof HTMLInputElement) {
+      if (this.inputField) {
         const inputField: HTMLInputElement = this.inputField.nativeElement;
         if (inputField.type === 'number') {
           // number fields don't have setSelectionRange
@@ -99,7 +99,7 @@ export class BaseControlComponent implements OnChanges {
           throw new Error("Expected array");
         } else if (index >= oldValue.length) {
           throw new Error("Index out of bounds");
-        } else if ((oldValue[index] !== undefined && typeof oldValue[index] !== typeof v)) {
+        } else if (!Array.isArray(oldValue) || (oldValue[index] !== undefined && typeof oldValue[index] !== typeof v)) {
           throw new Error("Expected value of type " + this.data.type);
         }
 
@@ -111,7 +111,7 @@ export class BaseControlComponent implements OnChanges {
       case BaseControlType.string: {
         let value = target.value;
         if (value === "" && this.data.required) {
-          value = `${this.data.default}`;
+          value = `${this.data.default ?? ''}`;
         }
 
         target.value = value as string;
@@ -140,9 +140,7 @@ export class BaseControlComponent implements OnChanges {
       }
     }
 
-    if (e instanceof KeyboardEvent && e.key === 'Enter' || e.type === 'blur') {
-      this.cdr.detectChanges();
-    }
+    this.cdr.detectChanges();
   }
 }
 
